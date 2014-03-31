@@ -34,18 +34,13 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <name>MSC2 Benchmarks Provider</name>
+  <name>MSC2 Benchmarks</name>
   <groupId>org.jboss</groupId>
-  <artifactId>msc2-benchmarks-provider</artifactId>
+  <artifactId>msc2-benchmarks</artifactId>
   <packaging>jar</packaging>
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.jboss</groupId>
-        <artifactId>msc-benchmarks-provider-api</artifactId>
-        <version>${version}</version>
-      </dependency>
       <dependency>
         <groupId>org.jboss.msc</groupId>
         <artifactId>jboss-msc</artifactId>
@@ -55,10 +50,6 @@
   </dependencyManagement>
 
   <dependencies>
-    <dependency>
-      <groupId>org.jboss</groupId>
-      <artifactId>msc-benchmarks-provider-api</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.jboss.msc</groupId>
       <artifactId>jboss-msc</artifactId>

@@ -3,6 +3,11 @@
 .project
 .settings
 
+# Idea project files
+*.iml
+*.ipr
+*.iws
+
 # Maven work directories
 target
 

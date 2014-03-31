@@ -56,10 +56,8 @@
   </scm>
 
   <modules>
-    <module>modules/benchmark-provider-api</module>
-    <module>modules/benchmark-test-suite</module>
-    <module>modules/msc1-benchmark-provider</module>
-    <module>modules/msc2-benchmark-provider</module>
+    <module>modules/msc1-benchmarks</module>
+    <module>modules/msc2-benchmarks</module>
   </modules>
 
   <properties>
