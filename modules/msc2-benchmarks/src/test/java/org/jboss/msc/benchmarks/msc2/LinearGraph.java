@@ -94,7 +94,9 @@ final class LinearGraph {
                 for (int i = leftClosedIntervalIndex; i < rightOpenIntervalIndex; i++) {
                     builder = context.addService(CountingService.class, registry, ServiceName.of("" + i), txn).setService(new CountingService(statistics));
                     builder.setMode(ServiceMode.ON_DEMAND);
-                    builder.addDependency(ServiceName.of("" + (i + 1)), UNREQUIRED);
+                    if (i + 1 != rightOpenIntervalIndex) {
+                        builder.addDependency(ServiceName.of("" + (i + 1)), UNREQUIRED);
+                    }
                     builder.install();
                 }
             } finally {

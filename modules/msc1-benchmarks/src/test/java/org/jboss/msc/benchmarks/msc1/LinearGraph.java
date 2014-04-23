@@ -84,7 +84,9 @@ final class LinearGraph {
                 for (int i = leftClosedIntervalIndex; i < rightOpenIntervalIndex; i++) {
                     builder = container.addService(ServiceName.of("" + i), new CountingService(statistics));
                     builder.setInitialMode(ServiceController.Mode.ON_DEMAND);
-                    builder.addDependency(ServiceName.of("" + (i + 1)));
+                    if (i != rightOpenIntervalIndex - 1) {
+                        builder.addDependency(ServiceName.of("" + (i + 1)));
+                    }
                     builder.install();
                 }
             } finally {
