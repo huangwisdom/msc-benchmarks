@@ -32,7 +32,7 @@ import org.jboss.msc.service.ServiceName;
  */
 final class CompleteGraph {
 
-    static final long benchmark(final ServiceContainer container,
+    static final long benchmark(final ServiceContainer container, final ServiceController.Mode mode,
             final ServiceInvocationStatistics statistics, final int servicesCount, final int threadsCount) throws InterruptedException {
         final int range = servicesCount / threadsCount;
         final CountDownLatch threadsInitializedSignal = new CountDownLatch(threadsCount);
@@ -40,12 +40,12 @@ final class CompleteGraph {
         final CountDownLatch threadsFinishedSignal = new CountDownLatch(threadsCount);
         int leftClosedIntervalIndex = 0, rightOpenIntervalIndex = range + (servicesCount % threadsCount);
         new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
-                leftClosedIntervalIndex, rightOpenIntervalIndex, container, statistics, servicesCount)).start();
+                leftClosedIntervalIndex, rightOpenIntervalIndex, container, mode, statistics, servicesCount)).start();
         for (int i = 1; i < threadsCount; i++) {
             leftClosedIntervalIndex = rightOpenIntervalIndex;
             rightOpenIntervalIndex += range;
             new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
-                    leftClosedIntervalIndex, rightOpenIntervalIndex, container, statistics, servicesCount)).start();
+                    leftClosedIntervalIndex, rightOpenIntervalIndex, container, mode, statistics, servicesCount)).start();
         }
         threadsInitializedSignal.await();
         final long startTime = System.nanoTime();
@@ -62,11 +62,12 @@ final class CompleteGraph {
         private final int leftClosedIntervalIndex;
         private final int rightOpenIntervalIndex;
         private final ServiceContainer container;
+        private final ServiceController.Mode mode;
         private final ServiceInvocationStatistics statistics;
         private final int servicesCount;
     
         private InstallTask(final CountDownLatch threadsInitializedSignal, final CountDownLatch runBenchmarkSignal, final CountDownLatch threadsFinishedSignal,
-                                         final int leftClosedIntervalIndex, final int rightOpenIntervalIndex, final ServiceContainer container,
+                                         final int leftClosedIntervalIndex, final int rightOpenIntervalIndex, final ServiceContainer container, final ServiceController.Mode mode,
                                          final ServiceInvocationStatistics statistics, final int servicesCount) {
             this.threadsInitializedSignal = threadsInitializedSignal;
             this.runBenchmarkSignal = runBenchmarkSignal;
@@ -74,6 +75,7 @@ final class CompleteGraph {
             this.leftClosedIntervalIndex = leftClosedIntervalIndex;
             this.rightOpenIntervalIndex = rightOpenIntervalIndex;
             this.container = container;
+            this.mode = mode;
             this.statistics = statistics;
             this.servicesCount = servicesCount;
         }
@@ -85,7 +87,7 @@ final class CompleteGraph {
                 ServiceBuilder builder;
                 for (int i = leftClosedIntervalIndex; i < rightOpenIntervalIndex; i++) {
                     builder = container.addService(ServiceName.of("" + i), new CountingService(statistics));
-                    builder.setInitialMode(ServiceController.Mode.ON_DEMAND);
+                    builder.setInitialMode(mode);
                     for (int j = servicesCount - 1; j > i; j--) builder.addDependency(ServiceName.of("" + j));
                     builder.install();
                 }

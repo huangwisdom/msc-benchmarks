@@ -31,19 +31,19 @@ import org.jboss.msc.service.ServiceName;
  */
 final class DiscreteGraph {
 
-    static long benchmark(ServiceContainer container, ServiceInvocationStatistics statistics, int servicesCount, int threadsCount) throws InterruptedException {
+    static long benchmark(ServiceContainer container, ServiceController.Mode mode, ServiceInvocationStatistics statistics, int servicesCount, int threadsCount) throws InterruptedException {
         final int range = servicesCount / threadsCount;
         final CountDownLatch runBenchmarkSignal = new CountDownLatch(1);
         final CountDownLatch threadsInitializedSignal = new CountDownLatch(threadsCount);
         final CountDownLatch threadsFinishedSignal = new CountDownLatch(threadsCount);
         int leftClosedIntervalIndex = 0, rightOpenIntervalIndex = range + (servicesCount % threadsCount);
         new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
-                leftClosedIntervalIndex, rightOpenIntervalIndex, container, statistics)).start();
+                leftClosedIntervalIndex, rightOpenIntervalIndex, container, mode, statistics)).start();
         for (int i = 1; i < threadsCount; i++) {
             leftClosedIntervalIndex = rightOpenIntervalIndex;
             rightOpenIntervalIndex += range;
             new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
-                    leftClosedIntervalIndex, rightOpenIntervalIndex, container, statistics)).start();
+                    leftClosedIntervalIndex, rightOpenIntervalIndex, container, mode, statistics)).start();
         }
         threadsInitializedSignal.await();
         final long startTime = System.nanoTime();
@@ -60,17 +60,19 @@ final class DiscreteGraph {
         private final int leftClosedIntervalIndex;
         private final int rightOpenIntervalIndex;
         private final ServiceContainer container;
+        private final ServiceController.Mode mode;
         private ServiceInvocationStatistics statistics;
 
 
         private InstallTask(final CountDownLatch threadsInitializedSignal, final CountDownLatch runBenchmarkSignal, final CountDownLatch threadsFinishedSignal,
                 final int leftClosedIntervalIndex, final int rightOpenIntervalIndex, final ServiceContainer container,
-                final ServiceInvocationStatistics statistics) {
+                final ServiceController.Mode mode, final ServiceInvocationStatistics statistics) {
             this.threadsInitializedSignal = threadsInitializedSignal;
             this.runBenchmarkSignal = runBenchmarkSignal;
             this.threadsFinishedSignal = threadsFinishedSignal;
             this.leftClosedIntervalIndex = leftClosedIntervalIndex;
             this.rightOpenIntervalIndex = rightOpenIntervalIndex;
+            this.mode = mode;
             this.container = container;
             this.statistics = statistics;
         }
@@ -82,7 +84,7 @@ final class DiscreteGraph {
                 ServiceBuilder builder;
                 for (int i = leftClosedIntervalIndex; i < rightOpenIntervalIndex; i++) {
                     builder = container.addService(ServiceName.of("" + i), new CountingService(statistics));
-                    builder.setInitialMode(ServiceController.Mode.ON_DEMAND);
+                    builder.setInitialMode(mode);
                     builder.install();
                 }
             } finally {

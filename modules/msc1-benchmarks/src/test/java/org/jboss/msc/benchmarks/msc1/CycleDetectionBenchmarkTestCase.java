@@ -14,7 +14,7 @@ public class CycleDetectionBenchmarkTestCase extends AbstractBenchmarkTest {
 
     @Test
     public void completeGraph() throws Exception {
-        final long nanoseconds = CompleteGraph.benchmark(container, statistics, COMPLETE_GRAPH_SERVICES_COUNT, THREADS_COUNT);
+        final long nanoseconds = CompleteGraph.benchmark(container, ServiceController.Mode.ON_DEMAND, statistics, COMPLETE_GRAPH_SERVICES_COUNT, THREADS_COUNT);
         final int servicesCount = COMPLETE_GRAPH_SERVICES_COUNT;
         final String clazz = this.getClass().getName();
         final String method = ".completeGraph()";
@@ -28,7 +28,7 @@ public class CycleDetectionBenchmarkTestCase extends AbstractBenchmarkTest {
 
     @Test
     public void linearGraph() throws Exception {
-        final long nanoseconds = LinearGraph.benchmark(container, statistics, LINEAR_GRAPH_SERVICES_COUNT, THREADS_COUNT);
+        final long nanoseconds = LinearGraph.benchmark(container, ServiceController.Mode.ON_DEMAND, statistics, LINEAR_GRAPH_SERVICES_COUNT, THREADS_COUNT);
         final int servicesCount = LINEAR_GRAPH_SERVICES_COUNT;
         final String clazz = this.getClass().getName();
         final String method = ".linearGraph()";
@@ -42,7 +42,7 @@ public class CycleDetectionBenchmarkTestCase extends AbstractBenchmarkTest {
 
     @Test
     public void discreteGraph() throws Exception {
-        final long nanoseconds = DiscreteGraph.benchmark(container, statistics,  DISCRETE_GRAPH_SERVICES_COUNT, THREADS_COUNT);
+        final long nanoseconds = DiscreteGraph.benchmark(container, ServiceController.Mode.ON_DEMAND, statistics, DISCRETE_GRAPH_SERVICES_COUNT, THREADS_COUNT);
         final int servicesCount = DISCRETE_GRAPH_SERVICES_COUNT;
         final String clazz = this.getClass().getName();
         final String method = ".discreteGraph()";
