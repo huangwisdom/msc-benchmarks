@@ -36,10 +36,12 @@ final class DiscreteGraph {
         final CountDownLatch runBenchmarkSignal = new CountDownLatch(1);
         final CountDownLatch threadsInitializedSignal = new CountDownLatch(threadsCount);
         final CountDownLatch threadsFinishedSignal = new CountDownLatch(threadsCount);
-        int leftClosedIntervalIndex, rightOpenIntervalIndex;
-        for (int i = 0; i < threadsCount; i++) {
-            leftClosedIntervalIndex = range * i;
-            rightOpenIntervalIndex = range * (i + 1);
+        int leftClosedIntervalIndex = 0, rightOpenIntervalIndex = range + (servicesCount % threadsCount);
+        new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
+                leftClosedIntervalIndex, rightOpenIntervalIndex, container, statistics)).start();
+        for (int i = 1; i < threadsCount; i++) {
+            leftClosedIntervalIndex = rightOpenIntervalIndex;
+            rightOpenIntervalIndex += range;
             new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
                     leftClosedIntervalIndex, rightOpenIntervalIndex, container, statistics)).start();
         }

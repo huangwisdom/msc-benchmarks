@@ -34,14 +34,16 @@ final class LinearGraph {
 
     static final long benchmark (final ServiceContainer container,
             final ServiceInvocationStatistics statistics, final int servicesCount, final int threadsCount) throws InterruptedException {
-        final int range = (servicesCount - 1) / threadsCount;
+        final int range = servicesCount / threadsCount;
         final CountDownLatch threadsInitializedSignal = new CountDownLatch(threadsCount);
         final CountDownLatch runBenchmarkSignal = new CountDownLatch(1);
         final CountDownLatch threadsFinishedSignal = new CountDownLatch(threadsCount);
-        int leftClosedIntervalIndex, rightOpenIntervalIndex;
-        for (int i = 0; i < threadsCount; i++) {
-            leftClosedIntervalIndex = range * i;
-            rightOpenIntervalIndex = range * (i + 1);
+        int leftClosedIntervalIndex = 0, rightOpenIntervalIndex = range + (servicesCount % threadsCount);
+        new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
+                leftClosedIntervalIndex, rightOpenIntervalIndex, container, statistics)).start();
+        for (int i = 1; i < threadsCount; i++) {
+            leftClosedIntervalIndex = rightOpenIntervalIndex;
+            rightOpenIntervalIndex += range;
             new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
                     leftClosedIntervalIndex, rightOpenIntervalIndex, container, statistics)).start();
         }
@@ -82,7 +84,7 @@ final class LinearGraph {
                 for (int i = leftClosedIntervalIndex; i < rightOpenIntervalIndex; i++) {
                     builder = container.addService(ServiceName.of("" + i), new CountingService(statistics));
                     builder.setInitialMode(ServiceController.Mode.ON_DEMAND);
-                        builder.addDependency(ServiceName.of("" + (i + 1)));
+                    builder.addDependency(ServiceName.of("" + (i + 1)));
                     builder.install();
                 }
             } finally {
