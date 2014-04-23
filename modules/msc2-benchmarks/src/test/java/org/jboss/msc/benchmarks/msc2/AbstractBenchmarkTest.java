@@ -65,9 +65,12 @@ public class AbstractBenchmarkTest {
 
     @After
     public void tearDown() throws Exception {
+        final long startTime = System.nanoTime();
         final BasicTransaction shutDownTxn = txnController.createTransaction(executor);
         container.shutdown(shutDownTxn);
         prepareAndCommit(txnController, shutDownTxn);
+        final long nanoseconds = System.nanoTime() - startTime;
+        System.out.println(" shutdown time: "+ (nanoseconds / 1000000));
         executor.shutdown();
 //        CycleDetector.executionTime.set(0); TODO: uncomment
 //        ServiceBuilder.executionTime0.set(0);

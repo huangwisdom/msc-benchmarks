@@ -30,8 +30,11 @@ public class AbstractBenchmarkTest {
 
     @After
     public void tearDown() throws Exception {
+        final long startTime = System.nanoTime();
         container.shutdown();
         container.awaitTermination();
+        final long nanoseconds = System.nanoTime() - startTime;
+        System.out.println(" shutdown time: "+ (nanoseconds / 1000000));
         //ServiceContainerImpl.executionTime.set(0); TODO: uncomment
         //ServiceBuilderImpl.executionTime.set(0); TODO: uncomment
     }
