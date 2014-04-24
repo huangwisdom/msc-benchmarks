@@ -1,5 +1,7 @@
 package org.jboss.msc.benchmarks.msc1;
 
+import static org.jboss.msc.benchmarks.framework.BenchmarksConfig.*;
+
 import static org.junit.Assert.assertEquals;
 
 import org.jboss.msc.service.ServiceController;

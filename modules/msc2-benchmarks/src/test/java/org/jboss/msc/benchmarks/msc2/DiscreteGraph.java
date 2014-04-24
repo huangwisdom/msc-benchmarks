@@ -21,6 +21,7 @@ import static org.jboss.msc.benchmarks.msc2.AbstractBenchmarkTest.prepareAndComm
 
 import java.util.concurrent.CountDownLatch;
 
+import org.jboss.msc.benchmarks.framework.ServiceInvocationStatistics;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceContext;
 import org.jboss.msc.service.ServiceMode;

@@ -19,6 +19,8 @@ package org.jboss.msc.benchmarks.msc1;
 
 import java.util.concurrent.CountDownLatch;
 
+import org.jboss.msc.benchmarks.framework.ServiceInvocationStatistics;
+
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;

@@ -1,7 +1,10 @@
 package org.jboss.msc.benchmarks.msc1;
 
+import static org.jboss.msc.benchmarks.framework.BenchmarksConfig.*;
+
 import java.util.concurrent.TimeUnit;
 
+import org.jboss.msc.benchmarks.framework.ServiceInvocationStatistics;
 import org.jboss.msc.service.ServiceContainer;
 import org.junit.After;
 import org.junit.Before;
@@ -12,12 +15,6 @@ import org.junit.Before;
  * Created by ropalka on 4/2/14.
  */
 public class AbstractBenchmarkTest {
-
-    // TODO: be careful when setting more than 8 threads here - MSC1 has special property for it
-    static final int THREADS_COUNT = Integer.getInteger("jboss.msc.benchmark.threads.count", 8);
-    static final int COMPLETE_GRAPH_SERVICES_COUNT = Integer.getInteger("jboss.msc.benchmark.complete.graph.services.count", 1001);
-    static final int LINEAR_GRAPH_SERVICES_COUNT = Integer.getInteger("jboss.msc.benchmark.linear.graph.services.count", 1000/*1*/);
-    static final int DISCRETE_GRAPH_SERVICES_COUNT = Integer.getInteger("jboss.msc.benchmark.discrete.graph.services.count", 100000);
 
     static ServiceContainer container;
     static ServiceInvocationStatistics statistics;

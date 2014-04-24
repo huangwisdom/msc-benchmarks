@@ -15,24 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.msc.benchmarks.msc1;
+package org.jboss.msc.benchmarks.framework;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="mailto:ropalka@redhat.com">Richard Opalka</a>
- *
  */
 public final class ServiceInvocationStatistics {
 
-    final AtomicInteger startCallsCount = new AtomicInteger();
-    final AtomicInteger stopCallsCount = new AtomicInteger();
+    public final AtomicInteger startCallsCount = new AtomicInteger();
+    public final AtomicInteger stopCallsCount = new AtomicInteger();
 
-    int getStartCallsCount() {
+    public int getStartCallsCount() {
         return startCallsCount.get();
     }
 
-    int getStopCallsCount() {
+    public int getStopCallsCount() {
         return stopCallsCount.get();
     }
 

@@ -17,6 +17,7 @@
  */
 package org.jboss.msc.benchmarks.msc2;
 
+import org.jboss.msc.benchmarks.framework.ServiceInvocationStatistics;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StopContext;
