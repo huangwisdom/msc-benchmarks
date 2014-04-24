@@ -33,7 +33,6 @@ import org.jboss.msc.txn.TransactionController;
 /**
  * @author <a href="mailto:ropalka@redhat.com">Richard Opalka</a>
  * @author <a href="mailto:frainone@redhat.com">Flavia Rainone</a>
- *
  */
 final class DiscreteGraph {
     static long benchmark(final ServiceContext context, final ServiceRegistry registry, final ServiceMode mode,

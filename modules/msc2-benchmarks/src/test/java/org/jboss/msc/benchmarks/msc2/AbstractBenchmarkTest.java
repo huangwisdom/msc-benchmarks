@@ -68,14 +68,8 @@ public class AbstractBenchmarkTest {
         container.shutdown(shutDownTxn);
         prepareAndCommit(txnController, shutDownTxn);
         final long nanoseconds = System.nanoTime() - startTime;
-        System.out.println(" shutdown time: "+ (nanoseconds / 1000000));
+        System.out.println("Shutdown time: "+ (nanoseconds / 1000000));
         executor.shutdown();
-//        CycleDetector.executionTime.set(0); TODO: uncomment
-//        ServiceBuilder.executionTime0.set(0);
-//        ServiceBuilder.executionTime1.set(0);
-//        ServiceBuilder.executionTime2.set(0);
-//        ServiceBuilder.executionTime3.set(0);
-//        ServiceBuilder.executionTime4.set(0);
     }
 
     public static void prepareAndCommit(final TransactionController txnController, final BasicTransaction txn) {

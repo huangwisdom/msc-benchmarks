@@ -24,7 +24,6 @@ import org.jboss.msc.service.StopContext;
 
 /**
  * @author <a href="mailto:ropalka@redhat.com">Richard Opalka</a>
- *
  */
 final class CountingService implements Service {
 

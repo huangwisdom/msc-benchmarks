@@ -27,10 +27,8 @@ import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 
 /**
- * 
  * @author <a href="mailto:ropalka@redhat.com">Richard Opalka</a>
  * @author <a href="mailto:frainone@redhat.com">Flavia Rainone</a>
- *
  */
 final class CompleteGraph {
 

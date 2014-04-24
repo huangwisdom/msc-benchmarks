@@ -25,9 +25,8 @@ import org.jboss.msc.service.StopContext;
 
 /**
  * @author <a href="mailto:ropalka@redhat.com">Richard Opalka</a>
- *
  */
-public final class CountingService implements Service<Void> {
+final class CountingService implements Service<Void> {
 
     private final ServiceInvocationStatistics statistics;
 
