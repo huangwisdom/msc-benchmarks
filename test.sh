@@ -3,7 +3,6 @@
 PROPS="$PROPS -Djboss.msc.benchmark.discrete.graph.services.count=1000"
 PROPS="$PROPS -Djboss.msc.benchmark.linear.graph.services.count=1001"
 PROPS="$PROPS -Djboss.msc.benchmark.complete.graph.services.count=1001"
-PROPS="$PROPS -Djboss.msc.nonrecursive.cycle.detection=false"
 PROPS="$PROPS -DfailIfNoTests=false"
 #PROPS="$PROPS -Dtest=**/msc*/CycleDetectionBenchmarkTestCase#cycleDetectionDiscreteGraphAllServicesDown"
 #PROPS="$PROPS -Dtest=**/msc*/CycleDetectionBenchmarkTestCase#cycleDetectionLinearGraphAllServicesDown"
