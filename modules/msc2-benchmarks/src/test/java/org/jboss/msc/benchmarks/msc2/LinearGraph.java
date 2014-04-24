@@ -22,7 +22,6 @@ import static org.jboss.msc.service.DependencyFlag.UNREQUIRED;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.jboss.msc.benchmarks.framework.ServiceInvocationStatistics;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceContext;
 import org.jboss.msc.service.ServiceMode;
@@ -37,20 +36,20 @@ import org.jboss.msc.txn.TransactionController;
  */
 final class LinearGraph {
 
-    static final long benchmark (final ServiceContext context, final ServiceRegistry registry, final ServiceMode mode,
-            final BasicTransaction txn, final TransactionController txnController,  final ServiceInvocationStatistics statistics, final int servicesCount, final int threadsCount) throws InterruptedException {
+    static long benchmark(final ServiceContext context, final ServiceRegistry registry, final ServiceMode mode,
+            final BasicTransaction txn, final TransactionController txnController,  final CountingService service, final int servicesCount, final int threadsCount) throws InterruptedException {
         final int range = servicesCount / threadsCount;
         final CountDownLatch threadsInitializedSignal = new CountDownLatch(threadsCount);
         final CountDownLatch runBenchmarkSignal = new CountDownLatch(1);
         final CountDownLatch threadsFinishedSignal = new CountDownLatch(threadsCount);
         int leftClosedIntervalIndex = 0, rightOpenIntervalIndex = range + (servicesCount % threadsCount);
         new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
-                leftClosedIntervalIndex, rightOpenIntervalIndex, context, registry, mode, txn, statistics)).start();
+                leftClosedIntervalIndex, rightOpenIntervalIndex, context, registry, mode, txn, service)).start();
         for (int i = 1; i < threadsCount; i++) {
             leftClosedIntervalIndex = rightOpenIntervalIndex;
             rightOpenIntervalIndex += range;
             new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
-                    leftClosedIntervalIndex, rightOpenIntervalIndex, context, registry, mode, txn, statistics)).start();
+                    leftClosedIntervalIndex, rightOpenIntervalIndex, context, registry, mode, txn, service)).start();
         }
         threadsInitializedSignal.await();
         final long startTime = System.nanoTime();
@@ -71,11 +70,11 @@ final class LinearGraph {
         private final ServiceRegistry registry;
         private final ServiceMode mode;
         private final BasicTransaction txn;
-        private final ServiceInvocationStatistics statistics;
+        private final CountingService service;
 
         private InstallTask(final CountDownLatch threadsInitializedSignal, final CountDownLatch runBenchmarkSignal, final CountDownLatch threadsFinishedSignal,
                                          final int leftClosedIntervalIndex, final int rightOpenIntervalIndex, final ServiceContext context,
-                                         final ServiceRegistry registry, final ServiceMode mode, final BasicTransaction txn, final ServiceInvocationStatistics statistics) {
+                                         final ServiceRegistry registry, final ServiceMode mode, final BasicTransaction txn, final CountingService service) {
             this.threadsInitializedSignal = threadsInitializedSignal;
             this.runBenchmarkSignal = runBenchmarkSignal;
             this.threadsFinishedSignal = threadsFinishedSignal;
@@ -85,7 +84,7 @@ final class LinearGraph {
             this.registry = registry;
             this.mode = mode;
             this.txn = txn;
-            this.statistics = statistics;
+            this.service = service;
         }
 
         public void run() {
@@ -94,7 +93,7 @@ final class LinearGraph {
             try {
                 ServiceBuilder builder;
                 for (int i = leftClosedIntervalIndex; i < rightOpenIntervalIndex; i++) {
-                    builder = context.addService(CountingService.class, registry, ServiceName.of("" + i), txn).setService(new CountingService(statistics));
+                    builder = context.addService(CountingService.class, registry, ServiceName.of("" + i), txn).setService(service);
                     builder.setMode(mode);
                     if (i + 1 != rightOpenIntervalIndex) {
                         builder.addDependency(ServiceName.of("" + (i + 1)), UNREQUIRED);

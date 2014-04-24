@@ -19,7 +19,6 @@ package org.jboss.msc.benchmarks.msc1;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.jboss.msc.benchmarks.framework.ServiceInvocationStatistics;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
@@ -31,20 +30,20 @@ import org.jboss.msc.service.ServiceName;
  */
 final class LinearGraph {
 
-    static final long benchmark (final ServiceContainer container, final ServiceController.Mode mode,
-            final ServiceInvocationStatistics statistics, final int servicesCount, final int threadsCount) throws InterruptedException {
+    static long benchmark (final ServiceContainer container, final ServiceController.Mode mode,
+            final CountingService service, final int servicesCount, final int threadsCount) throws InterruptedException {
         final int range = servicesCount / threadsCount;
         final CountDownLatch threadsInitializedSignal = new CountDownLatch(threadsCount);
         final CountDownLatch runBenchmarkSignal = new CountDownLatch(1);
         final CountDownLatch threadsFinishedSignal = new CountDownLatch(threadsCount);
         int leftClosedIntervalIndex = 0, rightOpenIntervalIndex = range + (servicesCount % threadsCount);
         new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
-                leftClosedIntervalIndex, rightOpenIntervalIndex, container, mode, statistics)).start();
+                leftClosedIntervalIndex, rightOpenIntervalIndex, container, mode, service)).start();
         for (int i = 1; i < threadsCount; i++) {
             leftClosedIntervalIndex = rightOpenIntervalIndex;
             rightOpenIntervalIndex += range;
             new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
-                    leftClosedIntervalIndex, rightOpenIntervalIndex, container, mode, statistics)).start();
+                    leftClosedIntervalIndex, rightOpenIntervalIndex, container, mode, service)).start();
         }
         threadsInitializedSignal.await();
         final long startTime = System.nanoTime();
@@ -62,11 +61,11 @@ final class LinearGraph {
         private final int rightOpenIntervalIndex;
         private final ServiceContainer container;
         private final ServiceController.Mode mode;
-        private final ServiceInvocationStatistics statistics;
+        private final CountingService service;
 
         private InstallTask(final CountDownLatch threadsInitializedSignal, final CountDownLatch runBenchmarkSignal, final CountDownLatch threadsFinishedSignal,
                 final int leftClosedIntervalIndex, final int rightOpenIntervalIndex, final ServiceContainer container,
-                final ServiceController.Mode mode, final ServiceInvocationStatistics statistics) {
+                final ServiceController.Mode mode, final CountingService service) {
             this.threadsInitializedSignal = threadsInitializedSignal;
             this.runBenchmarkSignal = runBenchmarkSignal;
             this.threadsFinishedSignal = threadsFinishedSignal;
@@ -74,7 +73,7 @@ final class LinearGraph {
             this.rightOpenIntervalIndex = rightOpenIntervalIndex;
             this.container = container;
             this.mode = mode;
-            this.statistics = statistics;
+            this.service = service;
         }
 
         public void run() {
@@ -83,7 +82,7 @@ final class LinearGraph {
             try {
                 ServiceBuilder builder;
                 for (int i = leftClosedIntervalIndex; i < rightOpenIntervalIndex; i++) {
-                    builder = container.addService(ServiceName.of("" + i), new CountingService(statistics));
+                    builder = container.addService(ServiceName.of("" + i), service);
                     builder.setInitialMode(mode);
                     if (i != rightOpenIntervalIndex - 1) {
                         builder.addDependency(ServiceName.of("" + (i + 1)));

@@ -33,11 +33,13 @@ public class AbstractBenchmarkTest {
 
     static ServiceContainer container;
     static ServiceInvocationStatistics statistics;
+    static CountingService service;
 
     @Before
     public void setUp() throws Exception {
         container = ServiceContainer.Factory.create(THREADS_COUNT, 30L, TimeUnit.SECONDS);
         statistics = new ServiceInvocationStatistics();
+        service = new CountingService(statistics);
     }
 
     @After

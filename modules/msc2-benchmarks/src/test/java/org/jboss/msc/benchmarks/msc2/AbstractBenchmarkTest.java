@@ -49,6 +49,7 @@ public class AbstractBenchmarkTest {
     static ThreadPoolExecutor executor;
     static BasicTransaction txn;
     static ServiceInvocationStatistics statistics;
+    static CountingService service;
 
     @Before
     public void setUp() throws Exception {
@@ -59,6 +60,7 @@ public class AbstractBenchmarkTest {
         executor = new ThreadPoolExecutor(THREADS_COUNT, THREADS_COUNT, 30L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         txn = txnController.createTransaction(executor);
         statistics = new ServiceInvocationStatistics();
+        service = new CountingService(statistics);
     }
 
     @After
