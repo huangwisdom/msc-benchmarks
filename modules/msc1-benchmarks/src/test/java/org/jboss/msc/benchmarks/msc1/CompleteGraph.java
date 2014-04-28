@@ -30,6 +30,8 @@ import org.jboss.msc.service.ServiceName;
  */
 final class CompleteGraph {
 
+    private static volatile Throwable failure;
+
     static long benchmark(final ServiceContainer container, final ServiceController.Mode mode,
             final CountingService service, final int servicesCount, final int threadsCount) throws InterruptedException {
         final int range = servicesCount / threadsCount;
@@ -50,7 +52,7 @@ final class CompleteGraph {
         runBenchmarkSignal.countDown();
         threadsFinishedSignal.await();
         container.awaitStability();
-        return System.nanoTime() - startTime;
+        return failure == null ? System.nanoTime() - startTime : 0;
     }
 
     private static final class InstallTask implements Runnable {
@@ -89,6 +91,9 @@ final class CompleteGraph {
                     for (int j = servicesCount - 1; j > i; j--) builder.addDependency(ServiceName.of("" + j));
                     builder.install();
                 }
+            } catch (Throwable t) {
+                failure = t;
+                throw t;
             } finally {
                 threadsFinishedSignal.countDown();
             }

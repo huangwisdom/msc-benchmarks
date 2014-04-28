@@ -82,4 +82,9 @@ public class AbstractBenchmarkTest {
         txnController.commit(txn, commitListener);
         commitListener.awaitCompletionUninterruptibly();
     }
+
+    protected static String toMillis(final long nanoseconds) {
+        return nanoseconds == 0 ? "N/A" : "" + (nanoseconds / 1000000);
+    }
+
 }

@@ -21,6 +21,7 @@ import static org.jboss.msc.benchmarks.framework.BenchmarksConfig.*;
 import static org.jboss.msc.service.ServiceController.Mode.ACTIVE;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 
@@ -35,9 +36,10 @@ public final class ServiceStartBenchmarkTestCase extends AbstractBenchmarkTest {
         final int servicesCount = COMPLETE_GRAPH_SERVICES_COUNT;
         final String clazz = this.getClass().getName();
         final String method = ".completeGraph()";
-        System.out.println(clazz + method + " benchmark execution time: (services == " + servicesCount + ") " + (nanoseconds / 1000000));
+        System.out.println(clazz + method + " benchmark execution time: (services == " + servicesCount + ") " + toMillis(nanoseconds));
         assertEquals(servicesCount, statistics.getStartCallsCount());
         assertEquals(0, statistics.getStopCallsCount());
+        assertFalse(nanoseconds == 0);
     }
 
     @Test
@@ -46,9 +48,10 @@ public final class ServiceStartBenchmarkTestCase extends AbstractBenchmarkTest {
         final int servicesCount = LINEAR_GRAPH_SERVICES_COUNT;
         final String clazz = this.getClass().getName();
         final String method = ".linearGraph()";
-        System.out.println(clazz + method + " benchmark execution time: (services == " + servicesCount + ") " + (nanoseconds / 1000000));
+        System.out.println(clazz + method + " benchmark execution time: (services == " + servicesCount + ") " + toMillis(nanoseconds));
         assertEquals(servicesCount, statistics.getStartCallsCount());
         assertEquals(0, statistics.getStopCallsCount());
+        assertFalse(nanoseconds == 0);
     }
 
     @Test
@@ -57,9 +60,10 @@ public final class ServiceStartBenchmarkTestCase extends AbstractBenchmarkTest {
         final int servicesCount = DISCRETE_GRAPH_SERVICES_COUNT;
         final String clazz = this.getClass().getName();
         final String method = ".discreteGraph()";
-        System.out.println(clazz + method + " benchmark execution time: (services == " + servicesCount + ") " + (nanoseconds / 1000000));
+        System.out.println(clazz + method + " benchmark execution time: (services == " + servicesCount + ") " + toMillis(nanoseconds));
         assertEquals(servicesCount, statistics.getStartCallsCount());
         assertEquals(0, statistics.getStopCallsCount());
+        assertFalse(nanoseconds == 0);
     }
 
 }

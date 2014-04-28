@@ -30,6 +30,8 @@ import org.jboss.msc.service.ServiceName;
  */
 final class DiscreteGraph {
 
+    private static volatile Throwable failure;
+
     static long benchmark(final ServiceContainer container, final ServiceController.Mode mode,
             final CountingService service, int servicesCount, int threadsCount) throws InterruptedException {
         final int range = servicesCount / threadsCount;
@@ -50,7 +52,7 @@ final class DiscreteGraph {
         runBenchmarkSignal.countDown();
         threadsFinishedSignal.await();
         container.awaitStability();
-        return System.nanoTime() - startTime;
+        return failure == null ? System.nanoTime() - startTime : 0;
     }
 
     private static final class InstallTask implements Runnable {
@@ -87,6 +89,9 @@ final class DiscreteGraph {
                     builder.setInitialMode(mode);
                     builder.install();
                 }
+            } catch (Throwable t) {
+                failure = t;
+                throw t;
             } finally {
                 threadsFinishedSignal.countDown();
             }

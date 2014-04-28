@@ -48,7 +48,11 @@ public class AbstractBenchmarkTest {
         container.shutdown();
         container.awaitTermination();
         final long nanoseconds = System.nanoTime() - startTime;
-        System.out.println("Shutdown time: "+ (nanoseconds / 1000000));
+        System.out.println("Shutdown time: " + toMillis(nanoseconds));
+    }
+
+    protected static String toMillis(final long nanoseconds) {
+        return nanoseconds == 0 ? "N/A" : "" + (nanoseconds / 1000000);
     }
 
 }

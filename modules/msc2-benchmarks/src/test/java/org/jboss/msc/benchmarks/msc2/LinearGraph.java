@@ -36,6 +36,8 @@ import org.jboss.msc.txn.TransactionController;
  */
 final class LinearGraph {
 
+    private static volatile Throwable failure;
+
     static long benchmark(final ServiceContext context, final ServiceRegistry registry, final ServiceMode mode,
             final BasicTransaction txn, final TransactionController txnController,  final CountingService service, final int servicesCount, final int threadsCount) throws InterruptedException {
         final int range = servicesCount / threadsCount;
@@ -56,7 +58,7 @@ final class LinearGraph {
         runBenchmarkSignal.countDown();
         threadsFinishedSignal.await();
         prepareAndCommit(txnController, txn);
-        return System.nanoTime() - startTime;
+        return failure == null ? System.nanoTime() - startTime : 0;
     }
 
     private static final class InstallTask implements Runnable {
@@ -100,6 +102,9 @@ final class LinearGraph {
                     }
                     builder.install();
                 }
+            } catch (Throwable t) {
+                failure = t;
+                throw t;
             } finally {
                 threadsFinishedSignal.countDown();
             }
