@@ -6,9 +6,9 @@ mvn clean install $PROPS
 
 OUT_DIR=benchmark-logs
 
-services=10000
+services=1000
 x=$services
-for i in 1 2 3 4 5
+for i in 0 1 2 3 4
 do
   mkdir -p $OUT_DIR
   for msc_version in msc1 msc2
@@ -21,6 +21,7 @@ do
         touch $OUT_DIR/$FILE
         for iteration_no in 0 1 2 3 4 5 6 7 8 9
         do
+          PROPS="-DfailIfNoTests=false"
           PROPS="$PROPS -Djboss.msc.benchmark.discrete.graph.services.count=$x"
           PROPS="$PROPS -Djboss.msc.benchmark.linear.graph.services.count=$x"
           PROPS="$PROPS -Djboss.msc.benchmark.complete.graph.services.count=$x"
@@ -34,5 +35,3 @@ do
   # increment services count
   x=$(($x + services))
 done
-
-exit 0
