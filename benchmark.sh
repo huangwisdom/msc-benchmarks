@@ -26,7 +26,7 @@ do
           PROPS="$PROPS -Djboss.msc.benchmark.linear.graph.services.count=$x"
           PROPS="$PROPS -Djboss.msc.benchmark.complete.graph.services.count=$x"
           PROPS="$PROPS -Dtest=**/$msc_version/$suite_name#$test_name"
-          mvn test $PROPS 2>$OUT_DIR/$FILE"_$iteration_no.err" | grep "execution time" | tee >> $OUT_DIR/$FILE.out
+          mvn test $PROPS 2>$OUT_DIR/$FILE"_services"$x"_iteration"$iteration_no".err" | grep "execution time" | tee >> $OUT_DIR/$FILE".out"
         done
         cat $OUT_DIR/$FILE.out | awk -F ' ' ' { print $8" "$10 } ' | tee $OUT_DIR/$FILE.report
       done
