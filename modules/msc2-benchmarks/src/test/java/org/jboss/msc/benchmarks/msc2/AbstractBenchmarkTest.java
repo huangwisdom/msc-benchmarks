@@ -27,7 +27,7 @@ import org.jboss.msc.benchmarks.framework.ServiceInvocationStatistics;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceContext;
 import org.jboss.msc.service.ServiceRegistry;
-import org.jboss.msc.txn.BasicTransaction;
+import org.jboss.msc.txn.UpdateTransaction;
 import org.jboss.msc.txn.CommitResult;
 import org.jboss.msc.txn.CompletionListener;
 import org.jboss.msc.txn.PrepareResult;
@@ -47,7 +47,7 @@ public class AbstractBenchmarkTest {
     static ServiceRegistry registry;
     static ServiceContext context;
     static ThreadPoolExecutor executor;
-    static BasicTransaction txn;
+    static UpdateTransaction txn;
     static ServiceInvocationStatistics statistics;
     static CountingService service;
 
@@ -58,7 +58,9 @@ public class AbstractBenchmarkTest {
         registry = container.newRegistry();
         context = txnController.getServiceContext();
         executor = new ThreadPoolExecutor(THREADS_COUNT, THREADS_COUNT, 30L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-        txn = txnController.createTransaction(executor);
+        final CompletionListener<UpdateTransaction> listener = new CompletionListener<>();
+        txnController.createUpdateTransaction(executor, listener);
+        txn = listener.awaitCompletionUninterruptibly();
         statistics = new ServiceInvocationStatistics();
         service = new CountingService(statistics);
     }
@@ -66,7 +68,9 @@ public class AbstractBenchmarkTest {
     @After
     public void tearDown() throws Exception {
         final long startTime = System.nanoTime();
-        final BasicTransaction shutDownTxn = txnController.createTransaction(executor);
+        final CompletionListener<UpdateTransaction> listener = new CompletionListener<>();
+        txnController.createUpdateTransaction(executor, listener);
+        final UpdateTransaction shutDownTxn = listener.awaitCompletionUninterruptibly();
         container.shutdown(shutDownTxn);
         prepareAndCommit(txnController, shutDownTxn);
         final long nanoseconds = System.nanoTime() - startTime;
@@ -74,11 +78,11 @@ public class AbstractBenchmarkTest {
         executor.shutdown();
     }
 
-    public static void prepareAndCommit(final TransactionController txnController, final BasicTransaction txn) {
-        final CompletionListener<PrepareResult<BasicTransaction>> prepareListener = new CompletionListener<>();
+    public static void prepareAndCommit(final TransactionController txnController, final UpdateTransaction txn) {
+        final CompletionListener<PrepareResult<UpdateTransaction>> prepareListener = new CompletionListener<>();
         txnController.prepare(txn, prepareListener);
         prepareListener.awaitCompletionUninterruptibly();
-        final CompletionListener<CommitResult<BasicTransaction>> commitListener = new CompletionListener<>();
+        final CompletionListener<CommitResult<UpdateTransaction>> commitListener = new CompletionListener<>();
         txnController.commit(txn, commitListener);
         commitListener.awaitCompletionUninterruptibly();
     }

@@ -27,7 +27,7 @@ import org.jboss.msc.service.ServiceContext;
 import org.jboss.msc.service.ServiceMode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistry;
-import org.jboss.msc.txn.BasicTransaction;
+import org.jboss.msc.txn.UpdateTransaction;
 import org.jboss.msc.txn.TransactionController;
 
 /**
@@ -39,7 +39,7 @@ final class LinearGraph {
     private static volatile Throwable failure;
 
     static long benchmark(final ServiceContext context, final ServiceRegistry registry, final ServiceMode mode,
-            final BasicTransaction txn, final TransactionController txnController,  final CountingService service, final int servicesCount, final int threadsCount) throws InterruptedException {
+            final UpdateTransaction txn, final TransactionController txnController,  final CountingService service, final int servicesCount, final int threadsCount) throws InterruptedException {
         final int range = servicesCount / threadsCount;
         final CountDownLatch threadsInitializedSignal = new CountDownLatch(threadsCount);
         final CountDownLatch runBenchmarkSignal = new CountDownLatch(1);
@@ -71,12 +71,12 @@ final class LinearGraph {
         private final ServiceContext context;
         private final ServiceRegistry registry;
         private final ServiceMode mode;
-        private final BasicTransaction txn;
+        private final UpdateTransaction txn;
         private final CountingService service;
 
         private InstallTask(final CountDownLatch threadsInitializedSignal, final CountDownLatch runBenchmarkSignal, final CountDownLatch threadsFinishedSignal,
                                          final int leftClosedIntervalIndex, final int rightOpenIntervalIndex, final ServiceContext context,
-                                         final ServiceRegistry registry, final ServiceMode mode, final BasicTransaction txn, final CountingService service) {
+                                         final ServiceRegistry registry, final ServiceMode mode, final UpdateTransaction txn, final CountingService service) {
             this.threadsInitializedSignal = threadsInitializedSignal;
             this.runBenchmarkSignal = runBenchmarkSignal;
             this.threadsFinishedSignal = threadsFinishedSignal;
