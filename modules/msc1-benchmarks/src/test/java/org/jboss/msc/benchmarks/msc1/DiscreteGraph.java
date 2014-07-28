@@ -34,25 +34,30 @@ final class DiscreteGraph {
 
     static long benchmark(final ServiceContainer container, final ServiceController.Mode mode,
             final CountingService service, int servicesCount, int threadsCount) throws InterruptedException {
-        final int range = servicesCount / threadsCount;
-        final CountDownLatch runBenchmarkSignal = new CountDownLatch(1);
-        final CountDownLatch threadsInitializedSignal = new CountDownLatch(threadsCount);
-        final CountDownLatch threadsFinishedSignal = new CountDownLatch(threadsCount);
-        int leftClosedIntervalIndex = 0, rightOpenIntervalIndex = range + (servicesCount % threadsCount);
-        new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
-                leftClosedIntervalIndex, rightOpenIntervalIndex, container, mode, service)).start();
-        for (int i = 1; i < threadsCount; i++) {
-            leftClosedIntervalIndex = rightOpenIntervalIndex;
-            rightOpenIntervalIndex += range;
+        try {
+            final int range = servicesCount / threadsCount;
+            final CountDownLatch runBenchmarkSignal = new CountDownLatch(1);
+            final CountDownLatch threadsInitializedSignal = new CountDownLatch(threadsCount);
+            final CountDownLatch threadsFinishedSignal = new CountDownLatch(threadsCount);
+            int leftClosedIntervalIndex = 0, rightOpenIntervalIndex = range + (servicesCount % threadsCount);
             new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
                     leftClosedIntervalIndex, rightOpenIntervalIndex, container, mode, service)).start();
+            for (int i = 1; i < threadsCount; i++) {
+                leftClosedIntervalIndex = rightOpenIntervalIndex;
+                rightOpenIntervalIndex += range;
+                new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
+                        leftClosedIntervalIndex, rightOpenIntervalIndex, container, mode, service)).start();
+            }
+            threadsInitializedSignal.await();
+            final long startTime = System.nanoTime();
+            runBenchmarkSignal.countDown();
+            threadsFinishedSignal.await();
+            container.awaitStability();
+            return failure == null ? System.nanoTime() - startTime : 0;
+        } catch (Throwable t) {
+            t.printStackTrace(System.err);
+            return 0;
         }
-        threadsInitializedSignal.await();
-        final long startTime = System.nanoTime();
-        runBenchmarkSignal.countDown();
-        threadsFinishedSignal.await();
-        container.awaitStability();
-        return failure == null ? System.nanoTime() - startTime : 0;
     }
 
     private static final class InstallTask implements Runnable {
