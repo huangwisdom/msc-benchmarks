@@ -57,7 +57,7 @@ public class AbstractBenchmarkTest {
         container = txnController.createServiceContainer();
         registry = container.newRegistry();
         context = txnController.getServiceContext();
-        executor = new ThreadPoolExecutor(THREADS_COUNT, THREADS_COUNT, 30L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+        executor = new ThreadPoolExecutor(MSC_THREADS_COUNT, MSC_THREADS_COUNT, 30L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         final CompletionListener<UpdateTransaction> listener = new CompletionListener<>();
         txnController.createUpdateTransaction(executor, listener);
         txn = listener.awaitCompletionUninterruptibly();

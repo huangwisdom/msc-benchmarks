@@ -37,7 +37,7 @@ public class AbstractBenchmarkTest {
 
     @Before
     public void setUp() throws Exception {
-        container = ServiceContainer.Factory.create(THREADS_COUNT, 30L, TimeUnit.SECONDS);
+        container = ServiceContainer.Factory.create(MSC_THREADS_COUNT, 30L, TimeUnit.SECONDS);
         statistics = new ServiceInvocationStatistics();
         service = new CountingService(statistics);
     }

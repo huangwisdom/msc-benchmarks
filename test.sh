@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PROPS="$PROPS -Djboss.msc.benchmark.msc.threads.count=8"
+PROPS="$PROPS -Djboss.msc.benchmark.installation.threads.count=8"
 PROPS="$PROPS -Djboss.msc.benchmark.discrete.graph.services.count=1000"
 PROPS="$PROPS -Djboss.msc.benchmark.linear.graph.services.count=1000"
 PROPS="$PROPS -Djboss.msc.benchmark.complete.graph.services.count=1000"

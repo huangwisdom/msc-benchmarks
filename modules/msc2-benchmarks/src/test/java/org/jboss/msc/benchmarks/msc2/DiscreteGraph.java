@@ -38,7 +38,7 @@ final class DiscreteGraph {
     private static volatile Throwable failure;
 
     static long benchmark(final ServiceContext context, final ServiceRegistry registry, final ServiceMode mode,
-            final UpdateTransaction txn, final TransactionController txnController,  final CountingService service, int servicesCount, int threadsCount) throws InterruptedException {
+            final UpdateTransaction txn, final TransactionController txnController, final CountingService service, int servicesCount, int threadsCount) throws InterruptedException {
         try {
             final int range = servicesCount / threadsCount;
             final CountDownLatch threadsInitializedSignal = new CountDownLatch(threadsCount);

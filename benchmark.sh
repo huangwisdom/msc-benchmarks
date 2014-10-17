@@ -22,6 +22,8 @@ do
         for iteration_no in 0 1 2 3 4 5 6 7 8 9
         do
           PROPS="-DfailIfNoTests=false"
+          PROPS="$PROPS -Djboss.msc.benchmark.msc.threads.count=8"
+          PROPS="$PROPS -Djboss.msc.benchmark.installation.threads.count=8"
           PROPS="$PROPS -Djboss.msc.benchmark.discrete.graph.services.count=$x"
           PROPS="$PROPS -Djboss.msc.benchmark.linear.graph.services.count=$x"
           PROPS="$PROPS -Djboss.msc.benchmark.complete.graph.services.count=$x"

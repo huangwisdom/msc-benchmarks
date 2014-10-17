@@ -39,7 +39,7 @@ final class CompleteGraph {
     private static volatile Throwable failure;
 
     static long benchmark(final ServiceContext context, final ServiceRegistry registry, final ServiceMode mode,
-            final UpdateTransaction txn, final TransactionController txnController,  final CountingService service, final int servicesCount, final int threadsCount) throws InterruptedException {
+            final UpdateTransaction txn, final TransactionController txnController, final CountingService service, final int servicesCount, final int threadsCount) throws InterruptedException {
         try {
             final int range = servicesCount / threadsCount;
             final CountDownLatch threadsInitializedSignal = new CountDownLatch(threadsCount);
