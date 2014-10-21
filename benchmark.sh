@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-PROPS="$PROPS -DfailIfNoTests=false"
+PROPS="$PROPS -DfailIfNoTests=false -DenableAssertions=false"
 
 mvn clean install $PROPS
 
@@ -21,7 +21,7 @@ do
         touch $OUT_DIR/$FILE
         for iteration_no in 0 1 2 3 4 5 6 7 8 9
         do
-          PROPS="-DfailIfNoTests=false"
+          PROPS="-DfailIfNoTests=false -DenableAssertions=false"
           PROPS="$PROPS -Djboss.msc.benchmark.msc.threads.count=8"
           PROPS="$PROPS -Djboss.msc.benchmark.installation.threads.count=8"
           PROPS="$PROPS -Djboss.msc.benchmark.discrete.graph.services.count=$x"

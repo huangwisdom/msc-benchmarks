@@ -1,5 +1,6 @@
 #!/bin/bash
 
+PROPS="$PROPS -DenableAssertions=false"
 PROPS="$PROPS -Djboss.msc.benchmark.msc.threads.count=8"
 PROPS="$PROPS -Djboss.msc.benchmark.installation.threads.count=8"
 PROPS="$PROPS -Djboss.msc.benchmark.discrete.graph.services.count=1000"
