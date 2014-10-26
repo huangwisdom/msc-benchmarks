@@ -47,12 +47,12 @@ final class LinearGraph {
             final CountDownLatch threadsFinishedSignal = new CountDownLatch(threadsCount);
             int leftClosedIntervalIndex = 0, rightOpenIntervalIndex = range + (servicesCount % threadsCount);
             new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
-                    leftClosedIntervalIndex, rightOpenIntervalIndex, context, registry, mode, txn, service)).start();
+                    leftClosedIntervalIndex, rightOpenIntervalIndex, servicesCount, context, registry, mode, txn, service)).start();
             for (int i = 1; i < threadsCount; i++) {
                 leftClosedIntervalIndex = rightOpenIntervalIndex;
                 rightOpenIntervalIndex += range;
                 new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
-                        leftClosedIntervalIndex, rightOpenIntervalIndex, context, registry, mode, txn, service)).start();
+                        leftClosedIntervalIndex, rightOpenIntervalIndex, servicesCount, context, registry, mode, txn, service)).start();
             }
             threadsInitializedSignal.await();
             final long startTime = System.nanoTime();
@@ -78,9 +78,10 @@ final class LinearGraph {
         private final ServiceMode mode;
         private final UpdateTransaction txn;
         private final CountingService service;
+        private final int servicesCount;
 
         private InstallTask(final CountDownLatch threadsInitializedSignal, final CountDownLatch runBenchmarkSignal, final CountDownLatch threadsFinishedSignal,
-                                         final int leftClosedIntervalIndex, final int rightOpenIntervalIndex, final ServiceContext context,
+                                         final int leftClosedIntervalIndex, final int rightOpenIntervalIndex, final int servicesCount, final ServiceContext context,
                                          final ServiceRegistry registry, final ServiceMode mode, final UpdateTransaction txn, final CountingService service) {
             this.threadsInitializedSignal = threadsInitializedSignal;
             this.runBenchmarkSignal = runBenchmarkSignal;
@@ -92,6 +93,7 @@ final class LinearGraph {
             this.mode = mode;
             this.txn = txn;
             this.service = service;
+            this.servicesCount = servicesCount;
         }
 
         public void run() {
@@ -102,7 +104,7 @@ final class LinearGraph {
                 for (int i = leftClosedIntervalIndex; i < rightOpenIntervalIndex; i++) {
                     builder = context.addService(CountingService.class, registry, ServiceName.of("" + i), txn).setService(service);
                     builder.setMode(mode);
-                    if (i + 1 != rightOpenIntervalIndex) {
+                    if (i != servicesCount - 1) {
                         builder.addDependency(ServiceName.of("" + (i + 1)), UNREQUIRED);
                     }
                     builder.install();

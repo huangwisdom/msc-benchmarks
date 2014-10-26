@@ -41,12 +41,12 @@ final class LinearGraph {
             final CountDownLatch threadsFinishedSignal = new CountDownLatch(threadsCount);
             int leftClosedIntervalIndex = 0, rightOpenIntervalIndex = range + (servicesCount % threadsCount);
             new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
-                    leftClosedIntervalIndex, rightOpenIntervalIndex, container, mode, service)).start();
+                    leftClosedIntervalIndex, rightOpenIntervalIndex, servicesCount, container, mode, service)).start();
             for (int i = 1; i < threadsCount; i++) {
                 leftClosedIntervalIndex = rightOpenIntervalIndex;
                 rightOpenIntervalIndex += range;
                 new Thread(new InstallTask(threadsInitializedSignal, runBenchmarkSignal, threadsFinishedSignal,
-                        leftClosedIntervalIndex, rightOpenIntervalIndex, container, mode, service)).start();
+                        leftClosedIntervalIndex, rightOpenIntervalIndex, servicesCount, container, mode, service)).start();
             }
             threadsInitializedSignal.await();
             final long startTime = System.nanoTime();
@@ -69,9 +69,10 @@ final class LinearGraph {
         private final ServiceContainer container;
         private final ServiceController.Mode mode;
         private final CountingService service;
+        private final int servicesCount;
 
         private InstallTask(final CountDownLatch threadsInitializedSignal, final CountDownLatch runBenchmarkSignal, final CountDownLatch threadsFinishedSignal,
-                final int leftClosedIntervalIndex, final int rightOpenIntervalIndex, final ServiceContainer container,
+                final int leftClosedIntervalIndex, final int rightOpenIntervalIndex, final int servicesCount, final ServiceContainer container,
                 final ServiceController.Mode mode, final CountingService service) {
             this.threadsInitializedSignal = threadsInitializedSignal;
             this.runBenchmarkSignal = runBenchmarkSignal;
@@ -81,6 +82,7 @@ final class LinearGraph {
             this.container = container;
             this.mode = mode;
             this.service = service;
+            this.servicesCount = servicesCount;
         }
 
         public void run() {
@@ -91,7 +93,7 @@ final class LinearGraph {
                 for (int i = leftClosedIntervalIndex; i < rightOpenIntervalIndex; i++) {
                     builder = container.addService(ServiceName.of("" + i), service);
                     builder.setInitialMode(mode);
-                    if (i != rightOpenIntervalIndex - 1) {
+                    if (i != servicesCount - 1) {
                         builder.addDependency(ServiceName.of("" + (i + 1)));
                     }
                     builder.install();
