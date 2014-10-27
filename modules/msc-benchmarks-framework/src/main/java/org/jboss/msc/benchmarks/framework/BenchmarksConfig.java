@@ -28,8 +28,20 @@ public final class BenchmarksConfig {
     // TODO: be careful when setting more than 8 threads here - MSC1 has special property for it
     public static final int MSC_THREADS_COUNT = Integer.getInteger("jboss.msc.benchmark.msc.threads.count", 8);
     public static final int INSTALLATION_THREADS_COUNT = Integer.getInteger("jboss.msc.benchmark.installation.threads.count", 8);
-    public static final int COMPLETE_GRAPH_SERVICES_COUNT = Integer.getInteger("jboss.msc.benchmark.complete.graph.services.count", DEFAULT_SERVICES_COUNT);
-    public static final int LINEAR_GRAPH_SERVICES_COUNT = Integer.getInteger("jboss.msc.benchmark.linear.graph.services.count", DEFAULT_SERVICES_COUNT);
-    public static final int DISCRETE_GRAPH_SERVICES_COUNT = Integer.getInteger("jboss.msc.benchmark.discrete.graph.services.count", DEFAULT_SERVICES_COUNT);
+    public static final int COMPLETE_GRAPH_SERVICES_COUNT;
+    public static final int LINEAR_GRAPH_SERVICES_COUNT;
+    public static final int DISCRETE_GRAPH_SERVICES_COUNT;
+
+    static {
+        final int completeGraphServicesCount = Integer.getInteger("jboss.msc.benchmark.complete.graph.services.count", DEFAULT_SERVICES_COUNT);
+        if (completeGraphServicesCount < INSTALLATION_THREADS_COUNT) throw new RuntimeException("Configuration error!");
+        COMPLETE_GRAPH_SERVICES_COUNT = completeGraphServicesCount - (completeGraphServicesCount % INSTALLATION_THREADS_COUNT);
+        final int linearGraphServicesCount = Integer.getInteger("jboss.msc.benchmark.linear.graph.services.count", DEFAULT_SERVICES_COUNT);
+        if (linearGraphServicesCount < INSTALLATION_THREADS_COUNT) throw new RuntimeException("Configuration error!");
+        LINEAR_GRAPH_SERVICES_COUNT = linearGraphServicesCount - (linearGraphServicesCount % INSTALLATION_THREADS_COUNT);
+        final int discreteGraphServicesCount = Integer.getInteger("jboss.msc.benchmark.discrete.graph.services.count", DEFAULT_SERVICES_COUNT);
+        if (discreteGraphServicesCount < INSTALLATION_THREADS_COUNT) throw new RuntimeException("Configuration error!");
+        DISCRETE_GRAPH_SERVICES_COUNT = discreteGraphServicesCount - (discreteGraphServicesCount % INSTALLATION_THREADS_COUNT);
+    }
 
 }
