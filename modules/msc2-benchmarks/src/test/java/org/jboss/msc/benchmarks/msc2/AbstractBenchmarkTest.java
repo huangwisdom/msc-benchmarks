@@ -29,9 +29,9 @@ import org.jboss.msc.service.ServiceContext;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.txn.UpdateTransaction;
 import org.jboss.msc.txn.CommitResult;
-import org.jboss.msc.txn.CompletionListener;
 import org.jboss.msc.txn.PrepareResult;
 import org.jboss.msc.txn.TransactionController;
+import org.jboss.msc.util.CompletionListener;
 import org.junit.After;
 import org.junit.Before;
 
