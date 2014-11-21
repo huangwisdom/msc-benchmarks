@@ -99,7 +99,7 @@ final class DiscreteGraph {
             try {
                 ServiceBuilder builder;
                 for (int i = leftClosedIntervalIndex; i < rightOpenIntervalIndex; i++) {
-                    builder = context.addService(CountingService.class, registry, ServiceName.of("" + i), txn).setService(service);
+                    builder = context.addService(registry, ServiceName.of("" + i)).setService(service);
                     builder.setMode(mode);
                     builder.install();
                 }

@@ -28,8 +28,6 @@ import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceContext;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.txn.UpdateTransaction;
-import org.jboss.msc.txn.CommitResult;
-import org.jboss.msc.txn.PrepareResult;
 import org.jboss.msc.txn.TransactionController;
 import org.jboss.msc.util.CompletionListener;
 import org.junit.After;
@@ -56,11 +54,11 @@ public class AbstractBenchmarkTest {
         txnController = TransactionController.createInstance();
         container = txnController.createServiceContainer();
         registry = container.newRegistry();
-        context = txnController.getServiceContext();
         executor = new ThreadPoolExecutor(MSC_THREADS_COUNT, MSC_THREADS_COUNT, 30L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         final CompletionListener<UpdateTransaction> listener = new CompletionListener<>();
         txnController.createUpdateTransaction(executor, listener);
         txn = listener.awaitCompletionUninterruptibly();
+        context = txnController.getServiceContext(txn);
         statistics = new ServiceInvocationStatistics();
         service = new CountingService(statistics);
     }
@@ -79,10 +77,10 @@ public class AbstractBenchmarkTest {
     }
 
     public static void prepareAndCommit(final TransactionController txnController, final UpdateTransaction txn) {
-        final CompletionListener<PrepareResult<UpdateTransaction>> prepareListener = new CompletionListener<>();
+        final CompletionListener<UpdateTransaction> prepareListener = new CompletionListener<>();
         txnController.prepare(txn, prepareListener);
         prepareListener.awaitCompletionUninterruptibly();
-        final CompletionListener<CommitResult<UpdateTransaction>> commitListener = new CompletionListener<>();
+        final CompletionListener<UpdateTransaction> commitListener = new CompletionListener<>();
         txnController.commit(txn, commitListener);
         commitListener.awaitCompletionUninterruptibly();
     }

@@ -103,7 +103,7 @@ final class CompleteGraph {
             try {
                 ServiceBuilder builder;
                 for (int i = leftClosedIntervalIndex; i < rightOpenIntervalIndex; i++) {
-                    builder = context.addService(CountingService.class, registry, ServiceName.of("" + i), txn).setService(service);
+                    builder = context.addService(registry, ServiceName.of("" + i)).setService(service);
                     builder.setMode(mode);
                     for (int j = servicesCount - 1; j > i; j--)
                         builder.addDependency(ServiceName.of("" + j), UNREQUIRED);
