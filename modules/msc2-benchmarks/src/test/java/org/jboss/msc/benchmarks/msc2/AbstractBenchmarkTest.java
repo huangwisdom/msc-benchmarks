@@ -51,14 +51,14 @@ public class AbstractBenchmarkTest {
 
     @Before
     public void setUp() throws Exception {
-        txnController = TransactionController.createInstance();
-        container = txnController.createServiceContainer();
-        registry = container.newRegistry();
+        txnController = TransactionController.newInstance();
         executor = new ThreadPoolExecutor(MSC_THREADS_COUNT, MSC_THREADS_COUNT, 30L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         final CompletionListener<UpdateTransaction> listener = new CompletionListener<>();
-        txnController.createUpdateTransaction(executor, listener);
+        txnController.newUpdateTransaction(executor, listener);
         txn = listener.awaitCompletionUninterruptibly();
-        context = txnController.getServiceContext(txn);
+        container = txnController.newServiceContainer(txn);
+        registry = container.newRegistry(txn);
+        context = txnController.newServiceContext(txn);
         statistics = new ServiceInvocationStatistics();
         service = new CountingService(statistics);
     }
@@ -67,7 +67,7 @@ public class AbstractBenchmarkTest {
     public void tearDown() throws Exception {
         final long startTime = System.nanoTime();
         final CompletionListener<UpdateTransaction> listener = new CompletionListener<>();
-        txnController.createUpdateTransaction(executor, listener);
+        txnController.newUpdateTransaction(executor, listener);
         final UpdateTransaction shutDownTxn = listener.awaitCompletionUninterruptibly();
         container.shutdown(shutDownTxn);
         prepareAndCommit(txnController, shutDownTxn);
